@@ -123,9 +123,11 @@ int main() {
         glfwPollEvents();
     }
 
+    // Clean up Shader stuff
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteProgram(shaderProgram);
+
     // Clean up GLFW resources
     glfwTerminate();
     return 0;
