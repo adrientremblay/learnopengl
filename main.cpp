@@ -56,6 +56,8 @@ int main() {
         return -1;
     }
 
+    std::cout << glGetString(GL_VERSION) << std::endl;
+
     // Telling OpenGL viewport size
     glViewport(0, 0, 800, 600);
 
@@ -107,6 +109,7 @@ int main() {
 
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
+
         // input
         processInput(window);
 
