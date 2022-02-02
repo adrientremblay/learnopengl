@@ -2,6 +2,44 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+static unsigned int CompileShader(unsigned int type, const std::string& source) {
+    unsigned int id = glCreateShader(type);
+    const char* src = source.c_str();
+    glShaderSource(id, 1, &src, nullptr);
+    glCompileShader(id);
+
+    int result;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    if (result == GL_FALSE) {
+        int length;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        char* message = (char*)alloca(length * sizeof(char));
+        glGetShaderInfoLog(id, length, &length, message);
+        std::cout << "FAILED TO COMPILE " << (type == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT") << " SHADER: " << message << std::endl;
+        glDeleteShader(id);
+        return 0;
+    }
+
+    return id;
+}
+
+static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader) {
+    unsigned int program = glCreateProgram();
+    unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+    unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+    glAttachShader(program, vs);
+    glAttachShader(program, fs);
+
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
+    return program;
+}
+
 // Callback function for window resizes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
@@ -49,9 +87,11 @@ int main() {
 
     // Creating Vertex Buffer Object (VBO)
     // Ie. moving vertex data to VRAM
-    unsigned int buffer; // unsigned int to store id of created buffer
-    glGenBuffers(1, &buffer); // generating one buffer, storing the id in 'buffer'
-    glBindBuffer(GL_ARRAY_BUFFER, buffer); // selecting a buffer to use
+    unsigned int VBO, VAO; // unsigned int to store id of created buffer
+    glGenVertexArrays(1, &VAO); 
+    glGenBuffers(1, &VBO); // generating one buffer, storing the id in 'buffer'
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO); // selecting a buffer to use
     glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW); // giving the buffer some data
     // We must tell OpenGl how the data in the VBO is layed out
     // Index =  value in each vertex for each attribute
@@ -60,6 +100,26 @@ int main() {
     // pointer = byte offset to the vertex normal attribute
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+
+    // Compiling Shader, attaching Shader Program
+    std::string vertexShader = 
+        "#version 330 core\n"
+        "layout(location = 0) in vec4 position;\n"
+        "\n"
+        "void main() \n"
+        "{\n"
+        "   gl_Position = position;\n"
+        "}\n";
+    std::string fragmentShader = 
+        "#version 330 core\n"
+        "out vec4 color;\n"
+        "\n"
+        "void main() \n"
+        "{\n"
+        "   color = vec4(0.0, 1.0, 0.0, 1.0);\n"
+        "}\n";
+    unsigned int shader = CreateShader(vertexShader, fragmentShader);
+    glUseProgram(shader);
 
     // Render Loop
     while (!glfwWindowShouldClose(window)) {
