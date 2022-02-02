@@ -87,7 +87,7 @@ int main() {
 
     // Creating Vertex Buffer Object (VBO)
     // Ie. moving vertex data to VRAM
-    unsigned int VBO, VAO; // unsigned int to store id of created buffer
+    unsigned int VBO, VAO; // unsigned int to store id of created buffer, ... 
     glGenVertexArrays(1, &VAO); 
     glGenBuffers(1, &VBO); // generating one buffer, storing the id in 'buffer'
     glBindVertexArray(VAO);
@@ -139,6 +139,7 @@ int main() {
         glfwPollEvents();
     }
 
+    glDeleteProgram(shader);
     // Clean up GLFW resources
     glfwTerminate();
     return 0;
