@@ -81,6 +81,20 @@ int main () {
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog2 << std::endl;
     }
 
+    // creating the shader program
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    int shaderProgramLinkSuccess;
+    char infoLog3[512];
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &shaderProgramLinkSuccess);
+    if (!shaderProgramLinkSuccess) {
+       glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog3);
+        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog3 << std::endl;
+    }
+
     // OpenGL window configuration
     glViewport(0, 0, 800, 600); // tell OpenGL the size of the viewport
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // setting the callback func for window resize
