@@ -12,14 +12,21 @@ const float vertices[] = {
     0.0f, 0.5f, 0.0f,
 };
 
-// vertex shader
+// vertex shader source
 const char* vertexShaderSource =
     "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "\n"
-    "void main()\n"
-    "{\n"
+    "void main() {\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\n";
+
+const char* fragmentShaderSource =
+    "#version 330 core\n"
+    "out vec4 fragColor;\n" // todo: can I change the name of this from FragColor? why camel case?
+    "\n"
+    "void main() {\n"
+    "   fragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\n";
 
 int main () {
@@ -59,6 +66,19 @@ int main () {
     if (!vertexShaderCompileSuccess) {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // Creating fragment shader
+    unsigned int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+    int fragmentShaderCompileSuccess;
+    char infoLog2[512];
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fragmentShaderCompileSuccess);
+    if (!fragmentShaderCompileSuccess) {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog2);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog2 << std::endl;
     }
 
     // OpenGL window configuration
