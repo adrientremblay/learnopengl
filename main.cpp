@@ -95,6 +95,20 @@ int main () {
     glDeleteShader(vertexShader); // no longer needed after linking
     glDeleteShader(fragmentShader); // no longer needed after linking
 
+    // creating VAO to store rendering info
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // Rendering setup code
+    glBindVertexArray(VAO); // Binding VAO
+    // Copying vertex data into VBO
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // Telling OpenGL how to interpret vertex data
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+
     // OpenGL window configuration
     glViewport(0, 0, 800, 600); // tell OpenGL the size of the viewport
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // setting the callback func for window resize
@@ -106,14 +120,9 @@ int main () {
         // RENDERING
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        // Copying vertex data into VBO
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        // Telling OpenGL how to interpret vertex data
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
-        glEnableVertexAttribArray(0);
-        // Telling OpenGL to use our shader program
         glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // EVENTS AND SWAP BUFFERS
         glfwSwapBuffers(window); // swap the color buffer (represents pixels on the window)
