@@ -30,7 +30,14 @@ int main () {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // setting the callback func for window resize
     // Render loop
     while (!glfwWindowShouldClose(window)) { // checks if GLFW has been told to close the window
+        // INPUT
         processInput(window); // processing user input
+
+        // RENDERING
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // EVENTS AND SWAP BUFFERS
         glfwSwapBuffers(window); // swap the color buffer (represents pixels on the window)
         glfwPollEvents(); // checks if any io events have been triggered
     }
