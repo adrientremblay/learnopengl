@@ -11,11 +11,13 @@ const float vertices[] = {
     0.5f, -0.5f, 0.0f, // bottom right
     -0.5f, 0.5f, 0.0f, // top left
     -0.5f, -0.5f, 0.0f, // bottom left
+    0.75f, 0.5f, 0.0f, // farther top right
+        -0.75f, 0.5f, 0.0f, // farther top left
 };
 
 const unsigned int indices[] = {
-        0, 1, 3,
-        0, 2, 3
+        0, 4, 1,
+        2, 5, 3
 };
 
 // vertex shader source
