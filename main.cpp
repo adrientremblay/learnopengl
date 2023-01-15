@@ -5,19 +5,28 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height); // prototype for window resize func
 void processInput(GLFWwindow* window); // prototype for input function
 
+const unsigned int WINDOW_WIDTH = 800;
+const unsigned int WINDOW_HEIGHT = 600;
+
 // vertex data for the triangle
-const float vertices[] = {
+const float vertices1[] = {
     0.5f, 0.5f, 0.0f, // top right
     0.5f, -0.5f, 0.0f, // bottom right
-    -0.5f, 0.5f, 0.0f, // top left
-    -0.5f, -0.5f, 0.0f, // bottom left
     0.75f, 0.5f, 0.0f, // farther top right
+};
+
+const unsigned int indices1[] = {
+        0, 1, 2,
+};
+
+const float vertices2[] = {
+        -0.5f, 0.5f, 0.0f, // top left
+        -0.5f, -0.5f, 0.0f, // bottom left
         -0.75f, 0.5f, 0.0f, // farther top left
 };
 
-const unsigned int indices[] = {
-        0, 4, 1,
-        2, 5, 3
+const unsigned int indices2[] = {
+        0, 1, 2
 };
 
 // vertex shader source
@@ -31,7 +40,7 @@ const char* vertexShaderSource =
 
 const char* fragmentShaderSource =
     "#version 330 core\n"
-    "out vec4 fragColor;\n" // todo: can I change the name of this from FragColor? why camel case?
+    "out vec4 fragColor;\n"
     "\n"
     "void main() {\n"
     "   fragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
@@ -44,7 +53,7 @@ int main () {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); // point 3 so version 3,3
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // telling GLFW we want to use OpenGL Core profile
     // Making a GLFW window
-    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL); // generate a window
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "LearnOpenGL", NULL, NULL); // generate a window
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -56,10 +65,6 @@ int main () {
     if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
     }
-
-    // Creating Vertex Buffer Object (VBO) so we can store vertex data in VRAM on GPU
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
 
     // Creating vertex shader
     unsigned int vertexShader;
@@ -103,31 +108,36 @@ int main () {
     glDeleteShader(vertexShader); // no longer needed after linking
     glDeleteShader(fragmentShader); // no longer needed after linking
 
-    // creating VAO to store rendering info
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
 
-    // creating EBO to store rendering indices
-    unsigned int EBO;
-    glGenBuffers(1, &EBO);
+    unsigned int VBOs[2], VAOs[2], EBOs[2];
+    // Creating Vertex Buffer Object (VBOs) so we can store vertex data in VRAM on GPU
+    glGenBuffers(2, VBOs);
+    // creating VAOs to store rendering meta info
+    glGenVertexArrays(2, VAOs);
+    // creating EBOs to store rendering indices
+    glGenBuffers(2, EBOs);
 
-    // Rendering initialization code
-    glBindVertexArray(VAO);
-    // Copying vertex data into VBO
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    // Index array stuff
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    // Telling OpenGL how to interpret vertex data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    // Rendering initialization for triangle 1
+    glBindVertexArray(VAOs[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW); // copying vertex data into VBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[0]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices1), indices1, GL_STATIC_DRAW); // index array stuff
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0); // Telling OpenGL how to interpret vertex data
+    glEnableVertexAttribArray(0);
+    // Rendering initialization for triangle 2
+    glBindVertexArray(VAOs[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices2, GL_STATIC_DRAW); // copying vertex data into VBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[1]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices1), indices2, GL_STATIC_DRAW); // index array stuff
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0); // Telling OpenGL how to interpret vertex data
     glEnableVertexAttribArray(0);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // saying we want to draw wireframes
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // saying we want to draw wireframes
 
     // OpenGL window configuration
-    glViewport(0, 0, 800, 600); // tell OpenGL the size of the viewport
+    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); // tell OpenGL the size of the viewport
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // setting the callback func for window resize
     // Render loop
     while (!glfwWindowShouldClose(window)) { // checks if GLFW has been told to close the window
@@ -138,9 +148,10 @@ int main () {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-//      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO); // no need to explicitly bind since it's done when binding VAO
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(VAOs[0]);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(VAOs[1]);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0); // unbind
 
         // EVENTS AND SWAP BUFFERS
@@ -149,8 +160,8 @@ int main () {
     }
 
     // de-allocation
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(2, VAOs);
+    glDeleteBuffers(2, VBOs);
     glDeleteProgram(shaderProgram);
 
     glfwTerminate(); // clean up GLFW resources
