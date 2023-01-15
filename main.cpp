@@ -5,6 +5,23 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height); // prototype for window resize func
 void processInput(GLFWwindow* window); // prototype for input function
 
+// vertex data for the triangle
+const float vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+    0.0f, 0.5f, 0.0f,
+};
+
+// vertex shader
+const char* vertexShaderSource =
+    "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\n";
+
 int main () {
     // Initialization and configuration of GLFW
     glfwInit(); // initialize the GLFW library
@@ -23,6 +40,25 @@ int main () {
     // Loading GLAD
     if(!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
+    }
+
+    // Creating Vertex Buffer Object (VBO) so we can store vertex data in VRAM on GPU
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Creating vertex shader
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+    int vertexShaderCompileSuccess;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vertexShaderCompileSuccess);
+    if (!vertexShaderCompileSuccess) {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
     // OpenGL window configuration
