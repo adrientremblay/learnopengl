@@ -52,8 +52,6 @@ int main () {
     // Creating Vertex Buffer Object (VBO) so we can store vertex data in VRAM on GPU
     unsigned int VBO;
     glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // Creating vertex shader
     unsigned int vertexShader;
@@ -94,6 +92,8 @@ int main () {
        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog3);
         std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog3 << std::endl;
     }
+    glDeleteShader(vertexShader); // no longer needed after linking
+    glDeleteShader(fragmentShader); // no longer needed after linking
 
     // OpenGL window configuration
     glViewport(0, 0, 800, 600); // tell OpenGL the size of the viewport
@@ -106,6 +106,14 @@ int main () {
         // RENDERING
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        // Copying vertex data into VBO
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        // Telling OpenGL how to interpret vertex data
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+        glEnableVertexAttribArray(0);
+        // Telling OpenGL to use our shader program
+        glUseProgram(shaderProgram);
 
         // EVENTS AND SWAP BUFFERS
         glfwSwapBuffers(window); // swap the color buffer (represents pixels on the window)
