@@ -3,6 +3,7 @@
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height); // prototype for window resize func
+void processInput(GLFWwindow* window); // prototype for input function
 
 int main () {
     // Initialization and configuration of GLFW
@@ -29,6 +30,7 @@ int main () {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // setting the callback func for window resize
     // Render loop
     while (!glfwWindowShouldClose(window)) { // checks if GLFW has been told to close the window
+        processInput(window); // processing user input
         glfwSwapBuffers(window); // swap the color buffer (represents pixels on the window)
         glfwPollEvents(); // checks if any io events have been triggered
     }
@@ -40,4 +42,10 @@ int main () {
 // window resize callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+}
+
+// process input callback
+void processInput(GLFWwindow* window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 }
