@@ -7,9 +7,15 @@ void processInput(GLFWwindow* window); // prototype for input function
 
 // vertex data for the triangle
 const float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-    0.0f, 0.5f, 0.0f,
+    0.5f, 0.5f, 0.0f, // top right
+    0.5f, -0.5f, 0.0f, // bottom right
+    -0.5f, 0.5f, 0.0f, // top left
+    -0.5f, -0.5f, 0.0f, // bottom left
+};
+
+const unsigned int indices[] = {
+        0, 1, 3,
+        0, 2, 3
 };
 
 // vertex shader source
@@ -100,14 +106,23 @@ int main () {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
-    // Rendering setup code
-    glBindVertexArray(VAO); // Binding VAO
+    // creating EBO to store rendering indices
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+
+    // Rendering initialization code
+    glBindVertexArray(VAO);
     // Copying vertex data into VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // Index array stuff
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     // Telling OpenGL how to interpret vertex data
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // saying we want to draw wireframes
 
     // OpenGL window configuration
     glViewport(0, 0, 800, 600); // tell OpenGL the size of the viewport
@@ -122,12 +137,19 @@ int main () {
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+//      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO); // no need to explicitly bind since it's done when binding VAO
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0); // unbind
 
         // EVENTS AND SWAP BUFFERS
         glfwSwapBuffers(window); // swap the color buffer (represents pixels on the window)
         glfwPollEvents(); // checks if any io events have been triggered
     }
+
+    // de-allocation
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteProgram(shaderProgram);
 
     glfwTerminate(); // clean up GLFW resources
     return 0;
