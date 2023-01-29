@@ -1,6 +1,7 @@
 #include <glad/glad.h> // helps loads drivers
 #include <GLFW/glfw3.h> // window system
 #include <iostream>
+#include <cmath>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height); // prototype for window resize func
 void processInput(GLFWwindow* window); // prototype for input function
@@ -40,13 +41,14 @@ const char* vertexShaderSource =
     "   vertexColor = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\n";
 
-const char* orangeFragmentShaderSource =
+const char* fragmentShaderSource =
     "#version 330 core\n"
     "out vec4 fragColor;\n"
     "in vec4 vertexColor;\n"
+    "uniform vec4 ourColor\n;"
     "\n"
     "void main() {\n"
-    "   fragColor = vertexColor;\n"
+    "   fragColor = ourColor;\n"
     "}\n";
 
 int main () {
@@ -83,7 +85,7 @@ int main () {
 
     // Creating fragment shader
     unsigned int fragmentShader1 = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader1, 1, &orangeFragmentShaderSource, NULL);
+    glShaderSource(fragmentShader1, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader1);
     glGetShaderiv(fragmentShader1, GL_COMPILE_STATUS, &success);
     if (!infoLog) {
@@ -143,7 +145,14 @@ int main () {
         // RENDERING
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        // cool color stuff
+        float timeValue = glfwGetTime();
+        float greenValue = ((cos(timeValue)) + 0.5f);
+        std::cout << greenValue << std::endl;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram1, "ourColor");
         glUseProgram(shaderProgram1);
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        // end cool color stuff
         glBindVertexArray(VAOs[0]);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(VAOs[1]);
