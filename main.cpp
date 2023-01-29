@@ -11,9 +11,10 @@ const unsigned int WINDOW_HEIGHT = 600;
 
 // vertex data for the triangle
 const float vertices1[] = {
-    0.5f, 0.5f, 0.0f, // top right
-    0.5f, -0.5f, 0.0f, // bottom right
-    0.75f, 0.5f, 0.0f, // farther top right
+        // positions                                                    colors
+    0.5f, 0.5f, 0.0f,                    1.0f, 0.0f, 0.0f, // red
+    0.5f, -0.5f, 0.0f,                   0.0f, 1.0f, 0.0f, // green
+    0.75f, 0.5f, 0.0f,                   0.0f, 0.0f, 1.0f, // blue
 };
 
 const unsigned int indices1[] = {
@@ -24,21 +25,21 @@ const unsigned int indices1[] = {
 const char* vertexShaderSource =
     "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
-    "out vec4 vertexColor;\n"
+    "layout (location = 1) in vec3 aColor;\n"
+    "out vec3 ourColor;\n"
     "\n"
     "void main() {\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "   vertexColor = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "   ourColor = aColor;\n"
     "}\n";
 
 const char* fragmentShaderSource =
     "#version 330 core\n"
     "out vec4 fragColor;\n"
-    "in vec4 vertexColor;\n"
-    "uniform vec4 ourColor\n;"
+    "in vec3 ourColor;\n"
     "\n"
     "void main() {\n"
-    "   fragColor = ourColor;\n"
+    "   fragColor = vec4(ourColor, 1.0);\n"
     "}\n";
 
 int main () {
@@ -111,8 +112,10 @@ int main () {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW); // copying vertex data into VBO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[0]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices1), indices1, GL_STATIC_DRAW); // index array stuff
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0); // Telling OpenGL how to interpret vertex data
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0); // Telling OpenGL how to interpret vertex data
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float))); // Telling OpenGL how to interpret vertex data
+    glEnableVertexAttribArray(1);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // saying we want to draw wireframes
 
