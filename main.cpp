@@ -70,7 +70,7 @@ int main () {
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // saying we want to draw wireframes
 
     Texture texture1 = Texture("images/adrien.jpeg");
-    Texture texture2 = Texture("images/flag.jpg");
+    Texture texture2 = Texture("images/weed.jpg");
 
     ourShader.use();
     glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "texture1"), 0);
