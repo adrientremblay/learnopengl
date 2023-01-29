@@ -13,9 +13,9 @@ const unsigned int WINDOW_HEIGHT = 600;
 // vertex data for the triangle
 const float vertices1[] = {
         // positions                                                    colors
-    0.5f, 0.5f, 0.0f,                    1.0f, 0.0f, 0.0f, // red
+    -0.5f, -0.5f, 0.0f,                    1.0f, 0.0f, 0.0f, // red
     0.5f, -0.5f, 0.0f,                   0.0f, 1.0f, 0.0f, // green
-    0.75f, 0.5f, 0.0f,                   0.0f, 0.0f, 1.0f, // blue
+    0.0f, 0.5f, 0.0f,                   0.0f, 0.0f, 1.0f, // blue
 };
 
 const unsigned int indices1[] = {
@@ -82,7 +82,7 @@ int main () {
         float greenValue = ((cos(timeValue)) + 0.5f);
         ourShader.use();
         ourShader.setVec4f("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
-        ourShader.setVec3f("aPosOffset", sin(timeValue - startTimeValue) - 0.5f, 0.0f, 0.0f);
+        ourShader.setVec3f("aPosOffset", sin(timeValue - startTimeValue) - 0.25f, 0.0f, 0.0f);
 
         glBindVertexArray(VAOs[0]);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
