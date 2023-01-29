@@ -37,7 +37,7 @@ const char* vertexShaderSource =
     "\n"
     "void main() {\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "   vertexColor = vec4(0.5, 0.0, 0.0, 1.0);\n"
+    "   vertexColor = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\n";
 
 const char* orangeFragmentShaderSource =
