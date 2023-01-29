@@ -2,8 +2,8 @@
 #include <GLFW/glfw3.h> // window system
 #include <iostream>
 #include <cmath>
-#include "Shader.h"
-#include "stb_image.h"
+#include "include/Shader.h"
+#include "lib/stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height); // prototype for window resize func
 void processInput(GLFWwindow* window); // prototype for input function
@@ -76,8 +76,9 @@ int main () {
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // specifying how we want to render textures
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // specifying how we want to render textures
+
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* imageData = stbi_load("images/adrien.jpeg", &width, &height, &nrChannels, 0);
+    unsigned char* imageData = stbi_load("images/flag.jpg", &width, &height, &nrChannels, 0);
     if (imageData) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -85,6 +86,25 @@ int main () {
         std::cerr << "Yo, an image failed to load. that's whack!!!" << std::endl;
     }
     stbi_image_free(imageData);
+
+    unsigned int texture2;
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // specifying how we want to render textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // specifying how we want to render textures
+
+    unsigned char* imageData2 = stbi_load("images/adrien.jpeg", &width, &height, &nrChannels, 0);
+    if (imageData2) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData2);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        std::cerr << "Yo, an image failed to load. that's whack!!!" << std::endl;
+    }
+    stbi_image_free(imageData2);
+
+    ourShader.use();
+    glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "texture1"), 0);
+    glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "texture2"), 1);
 
     // OpenGL window configuration
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); // tell OpenGL the size of the viewport
@@ -105,7 +125,10 @@ int main () {
         ourShader.setVec4f("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
         ourShader.setVec3f("aPosOffset", sin(timeValue - startTimeValue) - 0.25f, 0.0f, 0.0f);
 
+        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
         glBindTexture(GL_TEXTURE_2D, texture);
+        glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture
+        glBindTexture(GL_TEXTURE_2D, texture2);
         glBindVertexArray(VAOs[0]);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0); // unbind
