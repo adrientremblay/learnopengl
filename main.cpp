@@ -20,16 +20,6 @@ const unsigned int indices1[] = {
         0, 1, 2,
 };
 
-const float vertices2[] = {
-        -0.5f, 0.5f, 0.0f, // top left
-        -0.5f, -0.5f, 0.0f, // bottom left
-        -0.75f, 0.5f, 0.0f, // farther top left
-};
-
-const unsigned int indices2[] = {
-        0, 1, 2
-};
-
 // vertex shader source
 const char* vertexShaderSource =
     "#version 330 core\n"
@@ -123,14 +113,6 @@ int main () {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices1), indices1, GL_STATIC_DRAW); // index array stuff
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0); // Telling OpenGL how to interpret vertex data
     glEnableVertexAttribArray(0);
-    // Rendering initialization for triangle 2
-    glBindVertexArray(VAOs[1]);
-    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices2, GL_STATIC_DRAW); // copying vertex data into VBO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[1]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices1), indices2, GL_STATIC_DRAW); // index array stuff
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0); // Telling OpenGL how to interpret vertex data
-    glEnableVertexAttribArray(0);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // saying we want to draw wireframes
 
@@ -148,14 +130,11 @@ int main () {
         // cool color stuff
         float timeValue = glfwGetTime();
         float greenValue = ((cos(timeValue)) + 0.5f);
-        std::cout << greenValue << std::endl;
         int vertexColorLocation = glGetUniformLocation(shaderProgram1, "ourColor");
         glUseProgram(shaderProgram1);
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         // end cool color stuff
         glBindVertexArray(VAOs[0]);
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(VAOs[1]);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0); // unbind
 
@@ -165,8 +144,8 @@ int main () {
     }
 
     // de-allocation
-    glDeleteVertexArrays(2, VAOs);
-    glDeleteBuffers(2, VBOs);
+    glDeleteVertexArrays(1, VAOs);
+    glDeleteBuffers(1, VBOs);
     glDeleteProgram(shaderProgram1);
 
     glfwTerminate(); // clean up GLFW resources
