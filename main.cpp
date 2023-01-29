@@ -42,7 +42,7 @@ int main () {
         std::cout << "Failed to initialize GLAD" << std::endl;
     }
 
-    Shader ourShader("vertex_shader.vert", "shaders/fragment_shader.frag");
+    Shader ourShader("./shaders/vertex_shader.vert", "./shaders/fragment_shader.frag");
 
     unsigned int VBOs[2], VAOs[2], EBOs[2];
     // Creating Vertex Buffer Object (VBOs) so we can store vertex data in VRAM on GPU
