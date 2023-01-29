@@ -76,6 +76,7 @@ int main () {
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // specifying how we want to render textures
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // specifying how we want to render textures
+    stbi_set_flip_vertically_on_load(true);
     unsigned char* imageData = stbi_load("images/adrien.jpeg", &width, &height, &nrChannels, 0);
     if (imageData) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
