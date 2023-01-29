@@ -33,26 +33,21 @@ const unsigned int indices2[] = {
 const char* vertexShaderSource =
     "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
+    "out vec4 vertexColor;\n"
     "\n"
     "void main() {\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "   vertexColor = vec4(0.5, 0.0, 0.0, 1.0);\n"
     "}\n";
 
 const char* orangeFragmentShaderSource =
     "#version 330 core\n"
     "out vec4 fragColor;\n"
+    "in vec4 vertexColor;\n"
     "\n"
     "void main() {\n"
-    "   fragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "   fragColor = vertexColor;\n"
     "}\n";
-
-const char* yellowFragmentShaderSource =
-        "#version 330 core\n"
-        "out vec4 fragColor;\n"
-        "\n"
-        "void main() {\n"
-        "   fragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
-        "}\n";
 
 int main () {
     // Initialization and configuration of GLFW
@@ -107,29 +102,8 @@ int main () {
         std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
-    // Creating fragment shader
-    unsigned int fragmentShader2 = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader2, 1, &yellowFragmentShaderSource, NULL);
-    glCompileShader(fragmentShader2);
-    glGetShaderiv(fragmentShader2, GL_COMPILE_STATUS, &success);
-    if (!infoLog) {
-        glGetShaderInfoLog(fragmentShader2, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // creating the shader program 2
-    unsigned int shaderProgram2 = glCreateProgram();
-    glAttachShader(shaderProgram2, vertexShader);
-    glAttachShader(shaderProgram2, fragmentShader2);
-    glLinkProgram(shaderProgram2);
-    glGetProgramiv(shaderProgram2, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram2, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
     glDeleteShader(vertexShader); // no longer needed after linking
     glDeleteShader(fragmentShader1); // no longer needed after linking
-    glDeleteShader(fragmentShader2); // no longer needed after linking
 
     unsigned int VBOs[2], VAOs[2], EBOs[2];
     // Creating Vertex Buffer Object (VBOs) so we can store vertex data in VRAM on GPU
@@ -172,7 +146,6 @@ int main () {
         glUseProgram(shaderProgram1);
         glBindVertexArray(VAOs[0]);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-        glUseProgram(shaderProgram2);
         glBindVertexArray(VAOs[1]);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0); // unbind
@@ -186,7 +159,6 @@ int main () {
     glDeleteVertexArrays(2, VAOs);
     glDeleteBuffers(2, VBOs);
     glDeleteProgram(shaderProgram1);
-    glDeleteProgram(shaderProgram2);
 
     glfwTerminate(); // clean up GLFW resources
     return 0;
