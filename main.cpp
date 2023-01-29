@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h> // window system
 #include <iostream>
 #include <cmath>
+#include "Shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height); // prototype for window resize func
 void processInput(GLFWwindow* window); // prototype for input function
@@ -20,27 +21,6 @@ const float vertices1[] = {
 const unsigned int indices1[] = {
         0, 1, 2,
 };
-
-// vertex shader source
-const char* vertexShaderSource =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "layout (location = 1) in vec3 aColor;\n"
-    "out vec3 ourColor;\n"
-    "\n"
-    "void main() {\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "   ourColor = aColor;\n"
-    "}\n";
-
-const char* fragmentShaderSource =
-    "#version 330 core\n"
-    "out vec4 fragColor;\n"
-    "in vec3 ourColor;\n"
-    "\n"
-    "void main() {\n"
-    "   fragColor = vec4(ourColor, 1.0);\n"
-    "}\n";
 
 int main () {
     // Initialization and configuration of GLFW
@@ -62,41 +42,7 @@ int main () {
         std::cout << "Failed to initialize GLAD" << std::endl;
     }
 
-    int success;
-    char infoLog[512];
-    // Creating vertex shader
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // Creating fragment shader
-    unsigned int fragmentShader1 = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader1, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader1);
-    glGetShaderiv(fragmentShader1, GL_COMPILE_STATUS, &success);
-    if (!infoLog) {
-        glGetShaderInfoLog(fragmentShader1, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // creating the shader program 1
-    unsigned int shaderProgram1 = glCreateProgram();
-    glAttachShader(shaderProgram1, vertexShader);
-    glAttachShader(shaderProgram1, fragmentShader1);
-    glLinkProgram(shaderProgram1);
-    glGetProgramiv(shaderProgram1, GL_LINK_STATUS, &success);
-    if (!success) {
-       glGetProgramInfoLog(shaderProgram1, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    glDeleteShader(vertexShader); // no longer needed after linking
-    glDeleteShader(fragmentShader1); // no longer needed after linking
+    Shader ourShader("vertex_shader.vert", "shaders/fragment_shader.frag");
 
     unsigned int VBOs[2], VAOs[2], EBOs[2];
     // Creating Vertex Buffer Object (VBOs) so we can store vertex data in VRAM on GPU
@@ -130,13 +76,12 @@ int main () {
         // RENDERING
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        // cool color stuff
+
         float timeValue = glfwGetTime();
         float greenValue = ((cos(timeValue)) + 0.5f);
-        int vertexColorLocation = glGetUniformLocation(shaderProgram1, "ourColor");
-        glUseProgram(shaderProgram1);
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-        // end cool color stuff
+        ourShader.use();
+        ourShader.setVec4f("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
+
         glBindVertexArray(VAOs[0]);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0); // unbind
@@ -149,7 +94,7 @@ int main () {
     // de-allocation
     glDeleteVertexArrays(1, VAOs);
     glDeleteBuffers(1, VBOs);
-    glDeleteProgram(shaderProgram1);
+//    glDeleteProgram(shaderProgram1); todo: deallocate with the shader class
 
     glfwTerminate(); // clean up GLFW resources
     return 0;
