@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include "Shader.h"
+#include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height); // prototype for window resize func
 void processInput(GLFWwindow* window); // prototype for input function
@@ -11,15 +12,16 @@ const unsigned int WINDOW_WIDTH = 800;
 const unsigned int WINDOW_HEIGHT = 600;
 
 // vertex data for the triangle
-const float vertices1[] = {
-        // positions                                                    colors
-    -0.5f, -0.5f, 0.0f,                    1.0f, 0.0f, 0.0f, // red
-    0.5f, -0.5f, 0.0f,                   0.0f, 1.0f, 0.0f, // green
-    0.0f, 0.5f, 0.0f,                   0.0f, 0.0f, 1.0f, // blue
+const float vertices[] = {
+        // positions                                         colors                               texture coords
+    0.5f, 0.5f, 0.0f,                    1.0f, 0.0f, 0.0f,              1.0f, 1.0f,
+    0.5f, -0.5f, 0.0f,                   0.0f, 1.0f, 0.0f,            1.0f, 0.0f,
+   -0.5f, -0.5f, 0.0f,                   0.0f, 0.0f, 1.0f,             0.0f, 0.0f,
+   -0.5f, 0.5f, 0.0f,                   1.0f, 1.0f, 1.0f,             0.0f, 1.0f
 };
 
-const unsigned int indices1[] = {
-        0, 1, 2,
+const unsigned int indices[] = {
+        0, 2, 3,     1, 0, 2
 };
 
 int main () {
@@ -55,15 +57,33 @@ int main () {
     // Rendering initialization for triangle 1
     glBindVertexArray(VAOs[0]);
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW); // copying vertex data into VBO
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // copying vertex data into VBO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOs[0]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices1), indices1, GL_STATIC_DRAW); // index array stuff
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0); // Telling OpenGL how to interpret vertex data
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); // index array stuff
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) 0); // Telling OpenGL how to interpret vertex data
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float))); // Telling OpenGL how to interpret vertex data
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (3 * sizeof(float))); // Telling OpenGL how to interpret vertex data
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (6 * sizeof(float))); // Telling OpenGL how to interpret vertex data
+    glEnableVertexAttribArray(2);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // saying we want to draw wireframes
+
+    // Texture stuff
+    int width, height, nrChannels;
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // specifying how we want to render textures
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // specifying how we want to render textures
+    unsigned char* imageData = stbi_load("images/adrien.jpeg", &width, &height, &nrChannels, 0);
+    if (imageData) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        std::cerr << "Yo, an image failed to load. that's whack!!!" << std::endl;
+    }
+    stbi_image_free(imageData);
 
     // OpenGL window configuration
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); // tell OpenGL the size of the viewport
@@ -84,8 +104,9 @@ int main () {
         ourShader.setVec4f("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
         ourShader.setVec3f("aPosOffset", sin(timeValue - startTimeValue) - 0.25f, 0.0f, 0.0f);
 
+        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAOs[0]);
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0); // unbind
 
         // EVENTS AND SWAP BUFFERS
