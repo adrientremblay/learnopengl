@@ -26,6 +26,8 @@ public:
     void setFloat(const std::string &name, float value) const;
 
     void setVec4f(const std::string &name, float f1, float f2, float f3, float f4) const;
+
+    void setVec3f(const std::string &name, float f1, float f2, float f3) const;
 };
 
 

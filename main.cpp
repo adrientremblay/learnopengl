@@ -69,6 +69,7 @@ int main () {
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); // tell OpenGL the size of the viewport
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // setting the callback func for window resize
     // Render loop
+    float startTimeValue = glfwGetTime();
     while (!glfwWindowShouldClose(window)) { // checks if GLFW has been told to close the window
         // INPUT
         processInput(window); // processing user input
@@ -81,6 +82,7 @@ int main () {
         float greenValue = ((cos(timeValue)) + 0.5f);
         ourShader.use();
         ourShader.setVec4f("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
+        ourShader.setVec3f("aPosOffset", sin(timeValue - startTimeValue) - 0.5f, 0.0f, 0.0f);
 
         glBindVertexArray(VAOs[0]);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
