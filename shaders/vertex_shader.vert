@@ -9,7 +9,7 @@ out vec2 texCoord;
 uniform vec3 aPosOffset;
 
 void main() {
-   gl_Position = vec4(aPos.x + aPosOffset.x, aPos.y + aPosOffset.y, aPos.z + aPosOffset.z, 1.0);
+   gl_Position = vec4(aPos.xyz + aPosOffset.xyz, 1.0);
    ourColor = aColor;
    texCoord = aTexCoord;
 }
