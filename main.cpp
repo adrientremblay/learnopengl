@@ -110,6 +110,9 @@ int main () {
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); // tell OpenGL the size of the viewport
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // setting the callback func for window resize
 
+    // enable depth testing
+    glEnable(GL_DEPTH_TEST);
+
     // Render loop
     float startTimeValue = glfwGetTime();
     while (!glfwWindowShouldClose(window)) { // checks if GLFW has been told to close the window
@@ -118,7 +121,7 @@ int main () {
 
         // RENDERING
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         float timeValue = glfwGetTime();
         float greenValue = ((cos(timeValue)) + 0.5f);
