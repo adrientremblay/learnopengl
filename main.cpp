@@ -79,10 +79,6 @@ int main () {
     glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "texture1"), 0);
     glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "texture2"), 1);
 
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-
     // OpenGL window configuration
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); // tell OpenGL the size of the viewport
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // setting the callback func for window resize
@@ -101,6 +97,11 @@ int main () {
         ourShader.use();
         ourShader.setVec4f("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
         ourShader.setVec3f("aPosOffset", sin(timeValue - startTimeValue) - 0.25f, 0.0f, 0.0f);
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(sin(timeValue - startTimeValue) - 0.25f, 0.0f, 0.0f));
+        trans = glm::rotate(trans, timeValue, glm::vec3(0.0, 0.0, -1.0));
+        trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
         ourShader.setMat4("transform", trans);
 
         glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
