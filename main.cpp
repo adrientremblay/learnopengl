@@ -79,9 +79,19 @@ int main () {
     glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "texture1"), 0);
     glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "texture2"), 1);
 
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
     // OpenGL window configuration
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); // tell OpenGL the size of the viewport
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // setting the callback func for window resize
+
     // Render loop
     float startTimeValue = glfwGetTime();
     while (!glfwWindowShouldClose(window)) { // checks if GLFW has been told to close the window
@@ -98,11 +108,15 @@ int main () {
         ourShader.setVec4f("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
         ourShader.setVec3f("aPosOffset", sin(timeValue - startTimeValue) - 0.25f, 0.0f, 0.0f);
 
+        /*
         glm::mat4 trans = glm::mat4(1.0f);
         trans = glm::translate(trans, glm::vec3(sin(timeValue - startTimeValue) - 0.25f, 0.0f, 0.0f));
         trans = glm::rotate(trans, timeValue, glm::vec3(0.0, 0.0, -1.0));
         trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-        ourShader.setMat4("transform", trans);
+         */
+        ourShader.setMat4("model", model);
+        ourShader.setMat4("view", view);
+        ourShader.setMat4("projection", projection);
 
         glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
         glBindTexture(GL_TEXTURE_2D, texture1.textureId);
