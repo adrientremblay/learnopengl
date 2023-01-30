@@ -4,6 +4,9 @@
 #include <cmath>
 #include "include/Shader.h"
 #include "include/Texture.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height); // prototype for window resize func
 void processInput(GLFWwindow* window); // prototype for input function
@@ -75,6 +78,12 @@ int main () {
     ourShader.use();
     glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "texture1"), 0);
     glUniform1i(glGetUniformLocation(ourShader.shaderProgram, "texture2"), 1);
+
+    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+    vec = trans * vec;
+    std::cout << vec.x << vec.y << vec.z << std::endl;
 
     // OpenGL window configuration
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); // tell OpenGL the size of the viewport
