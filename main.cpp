@@ -58,6 +58,19 @@ float vertices[] = {
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
+glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+};
+
 int main () {
     // Initialization and configuration of GLFW
     glfwInit(); // initialize the GLFW library
@@ -129,19 +142,12 @@ int main () {
         ourShader.setVec4f("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
         ourShader.setVec3f("aPosOffset", sin(timeValue - startTimeValue) - 0.25f, 0.0f, 0.0f);
 
-
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(sin(timeValue - startTimeValue) - 0.25f, 0.0f, 0.0f));
-        model = glm::rotate(model, timeValue, glm::vec3(1.0, 1.0, -1.0));
-        model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
-
         glm::mat4 view = glm::mat4(1.0f);
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
         glm::mat4 projection;
         projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
-        ourShader.setMat4("model", model);
         ourShader.setMat4("view", view);
         ourShader.setMat4("projection", projection);
 
@@ -150,7 +156,18 @@ int main () {
         glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture
         glBindTexture(GL_TEXTURE_2D, texture2.textureId);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        for (unsigned int i = 0 ; i < 10 ; i++) {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            model = glm::translate(model, glm::vec3(sin(timeValue - startTimeValue) - 0.25f, 0.0f, 0.0f));
+            model = glm::rotate(model, timeValue, glm::vec3(1.0, 1.0, -1.0));
+            model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
+
+            ourShader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
         glBindVertexArray(0); // unbind
 
         // EVENTS AND SWAP BUFFERS
