@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <glm/mat4x4.hpp>
 
 class Shader {
 public:
@@ -28,6 +29,8 @@ public:
     void setVec4f(const std::string &name, float f1, float f2, float f3, float f4) const;
 
     void setVec3f(const std::string &name, float f1, float f2, float f3) const;
+
+    void setMat4(const std::string &name, glm::mat4 matrix) const;
 };
 
 

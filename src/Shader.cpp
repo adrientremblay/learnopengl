@@ -5,6 +5,7 @@
 #include "../include/Shader.h"
 
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {
     // 1. Reading source files
@@ -92,4 +93,8 @@ void Shader::setVec4f(const std::string &name, float f1, float f2, float f3, flo
 
 void Shader::setVec3f(const std::string &name, float f1, float f2, float f3) const {
     glUniform3f(glGetUniformLocation(shaderProgram, name.c_str()), f1, f2, f3);
+}
+
+void Shader::setMat4(const std::string &name, glm::mat4 matrix) const {
+    glUniformMatrix4fv(glad_glGetUniformLocation(shaderProgram, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
 }
